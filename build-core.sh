@@ -11,5 +11,9 @@ GUEST_DIR=/build/
 IMAGE=oe-builder
 BUILD_DIR=build
 
-docker run -v ${HOST_DIR}:${GUEST_DIR} -w ${GUEST_DIR} -u $(stat -c "%u:%g" .) ${IMAGE} bash -c "source openembedded-core/oe-init-build-env $BUILD_DIR ; bitbake ${TARGET}" 
+if [ -n "$TEMPLATECONF" ]; then
+  ENV="-e TEMPLATECONF=$GUEST_DIR/$(realpath --relative-to . $TEMPLATECONF)"
+fi
+
+docker run -v ${HOST_DIR}:${GUEST_DIR} -w ${GUEST_DIR} -u $(stat -c "%u:%g" .) ${ENV} ${IMAGE} bash -c "source openembedded-core/oe-init-build-env $BUILD_DIR ; bitbake ${TARGET}" 
 
